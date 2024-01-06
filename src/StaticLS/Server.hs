@@ -85,6 +85,9 @@ handleWorkspaceSymbol = LSP.requestHandler SMethod_WorkspaceSymbol $ \req res ->
     symbols <- lift (symbolInfo req._params._query)
     res $ Right . InL $ symbols
 
+handleSetTrace :: Handlers (LspT c StaticLs)
+handleSetTrace = LSP.notificationHandler SMethod_SetTrace $ \_ -> pure ()
+
 -----------------------------------------------------------------
 ----------------------- Server definition -----------------------
 -----------------------------------------------------------------
@@ -133,6 +136,7 @@ serverDef argOptions =
                 , handleDidClose
                 , handleDidSave
                 , handleWorkspaceSymbol
+                , handleSetTrace
                 ]
         , interpretHandler = \env -> Iso (runStaticLs env.staticEnv . LSP.runLspT env.config) liftIO
         , options = LSP.defaultOptions
